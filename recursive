@@ -1,0 +1,110 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+class Result {
+
+    /*
+     * Complete the 'icecreamParlor' function below.
+     *
+     * The function is expected to return an INTEGER_ARRAY.
+     * The function accepts following parameters:
+     *  1. INTEGER m
+     *  2. INTEGER_ARRAY arr
+     */
+
+    public static List<Integer> icecreamParlor(int m, List<Integer> arr) {
+    // Write your code here
+    System.out.println(m);
+    return recurse(m, arr, 0, new ArrayList<>(), new ArrayList<>(), 0);
+    }
+    public static List<Integer> recurse(int target, List<Integer> arr, int index, List<Integer> working, List<Integer> best, int sumbest){
+        //System.out.println(working.toString());
+        //System.out.println(index);
+        //System.out.println();
+        List<Integer> nope = new ArrayList<>();
+        if (working.size() >= 3){
+            int sum = arr.get(working.get(0) - 1) + arr.get(working.get(1)- 1) + arr.get(working.get(2) - 1);
+            //System.out.println(sum + "jfjfjfjjf");
+            if (sum <= target){
+                if (sum > sumbest){
+                    sumbest = sum;
+                    best = working;
+                }
+                return best;
+            }
+            else {
+                return nope;
+            }
+        }
+        if (index >= arr.size()){
+            return nope;
+        }
+        List<Integer> with = new ArrayList<>();
+        for (int m = 0; m < working.size(); m++){
+            with.add(working.get(m));
+        }
+        with.add(index + 1);
+        List<Integer> withresult = recurse(target, arr, index + 1, with, best, sumbest);
+        if (withresult.size() == 3){
+            return withresult;
+        }
+        List<Integer> without = new ArrayList<>();
+        for (int m = 0; m < working.size(); m++){
+            without.add(working.get(m));
+        }
+        List<Integer> outresult = recurse(target, arr, index + 1, without, best, sumbest);
+        if (outresult.size() == 3){
+            return outresult;
+        }
+        //System.out.println(best.toString());
+        //System.out.println(sumbest);
+        return nope;
+    }
+
+
+
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int t = Integer.parseInt(bufferedReader.readLine().trim());
+
+        IntStream.range(0, t).forEach(tItr -> {
+            try {
+                int m = Integer.parseInt(bufferedReader.readLine().trim());
+
+                int n = Integer.parseInt(bufferedReader.readLine().trim());
+
+                List<Integer> arr = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+                    .map(Integer::parseInt)
+                    .collect(toList());
+
+                List<Integer> result = Result.icecreamParlor(m, arr);
+
+                bufferedWriter.write(
+                    result.stream()
+                        .map(Object::toString)
+                        .collect(joining(" "))
+                    + "\n"
+                );
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
